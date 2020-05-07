@@ -1,0 +1,2 @@
+class TokenT:
+    pass
