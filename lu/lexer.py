@@ -65,10 +65,12 @@ class Lexer:
 
     def _wrap_main_prcd(self, tokens):
         header_tokens = self(MAIN_PROCEDURE_HEADER, _wrap_guard=True)
-        tail_tokens = self(MAIN_PROCEDURE_TAIL, _wrap_guard=True)
+        # exclude the very last EOL.
+        tail_tokens = self(MAIN_PROCEDURE_TAIL, _wrap_guard=True)[:-1]
         return header_tokens + tokens + tail_tokens
 
     def __call__(self, src: str, _wrap_guard=False) -> List[TokenT]:
+        # TODO: track src linenum
         tokens = []
 
         for ln in src.split('\n'):
