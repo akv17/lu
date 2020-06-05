@@ -1,35 +1,20 @@
 import re
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import List
 
-from .types import TokenT
-
-
-class TokenSpec(Enum):
-    EOL = -1
-    OP = 2
-    LOC = 3
-    NUM = 4
-    IDENT = 5
-    SYNTAX = 6
-
-
-@dataclass
-class Token:
-    spec: TokenSpec
-    val: str
+from .types import TokenT, List
+from .structs import Token, TokenSpec
 
 
 SYNTAX_TOKENS = {'(', ')', ','}
 TSPEC_REGEXP_MAP = {
     re.compile('^\n+$'): TokenSpec.EOL,
     re.compile(f'[{"".join(SYNTAX_TOKENS)}]'): TokenSpec.SYNTAX,
-    re.compile('DEF|RET|CALL|SET|ADD|SUB|MUL|DIV'): TokenSpec.OP,
+    re.compile('DEF|END|CALL|SET|ADD|SUB|MUL|DIV'): TokenSpec.OP,
     re.compile(r'^r[\d]+$'): TokenSpec.LOC,
     re.compile(r'^[\d]+$'): TokenSpec.NUM,
     re.compile('^[a-zA-Z_]+$'): TokenSpec.IDENT,
 }
+MAIN_PROCEDURE_HEADER = 'DEF __MAIN__ ()'
+MAIN_PROCEDURE_TAIL = 'END'
 
 
 class Lexer:
@@ -78,12 +63,20 @@ class Lexer:
         tokens = [self._create_token_obj(t) for t in tokens if t]
         return tokens
 
-    def __call__(self, src: str):
+    def _wrap_main_prcd(self, tokens):
+        header_tokens = self(MAIN_PROCEDURE_HEADER, _wrap_guard=True)
+        tail_tokens = self(MAIN_PROCEDURE_TAIL, _wrap_guard=True)
+        return header_tokens + tokens + tail_tokens
+
+    def __call__(self, src: str, _wrap_guard=False) -> List[TokenT]:
         tokens = []
 
         for ln in src.split('\n'):
             for word in ln.split(' ') + ['\n']:
                 tokens.extend(self._parse_word(word))
+
+        if not _wrap_guard:
+            tokens = self._wrap_main_prcd(tokens)
 
         return tokens
 
