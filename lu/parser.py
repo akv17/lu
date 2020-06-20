@@ -1,8 +1,8 @@
 from copy import copy
-from dataclasses import dataclass, field
 
 from .types import TokenT, List
-from .structs import Token, TokenSpec
+from .structs import TokenSpec
+from .procedure import Procedure
 
 
 class Stack:
@@ -30,37 +30,31 @@ class Stack:
         return self._cont.pop() if self._cont else None
 
 
-@dataclass
-class Procedure:
-    name: str
-    tokens: list = field(default_factory=list)
-
-
 def parse(tokens: List[TokenT]):
     active_stack = Stack()
     done_stack = Stack()
 
     for token in tokens:
-        if token.spec is TokenSpec.OP and token.val == 'DEF':
-            prcd = Procedure(name=token.val)
-            active_stack.push(prcd)
+        if token.spec == TokenSpec.DEF:
+            proc = Procedure()
+            active_stack.push(proc)
 
-        elif token.spec is TokenSpec.OP and token.val == 'END':
-            prcd = active_stack.pop()
+        elif token.spec == TokenSpec.END:
+            proc = active_stack.pop()
 
-            if prcd is None:
+            if proc is None:
                 msg = f'got END with no DEF.'
                 raise Exception(msg)
 
-            done_stack.push(prcd)
+            done_stack.push(proc)
 
         else:
-            prcd = active_stack.peek()
+            proc = active_stack.peek()
 
-            if prcd is None:
+            if proc is None:
                 msg = f'got no active procedure.'
                 raise Exception(msg)
 
-            prcd.tokens.append(token)
+            proc.tokens.append(token)
 
     return done_stack.elements
