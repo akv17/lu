@@ -1,17 +1,19 @@
 from dataclasses import dataclass
-from enum import Enum
 
 
-class TokenSpec(Enum):
-    EOL = -1
-    OP = 2
-    LOC = 3
-    NUM = 4
-    IDENT = 5
-    SYNTAX = 6
+class TokenSpec:
+    EOL = 'EOL'
+    OP = 'OP'
+    LOC = 'LOC'
+    NUM = 'NUM'
+    IDENT = 'IDENT'
+    SYNTAX = 'SYNTAX'
+    DEF = 'DEF'
+    END = 'END'
 
 
 @dataclass
 class Token:
     spec: TokenSpec
     val: str
+    line_num: int = -1
