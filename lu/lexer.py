@@ -3,12 +3,13 @@ import re
 from .types import TokenT, List
 from .structs import Token, TokenSpec
 
-
 SYNTAX_TOKENS = {'(', ')', ','}
 TSPEC_REGEXP_MAP = {
     re.compile('^\n+$'): TokenSpec.EOL,
     re.compile(f'[{"".join(SYNTAX_TOKENS)}]'): TokenSpec.SYNTAX,
-    re.compile('DEF|END|CALL|SET|ADD|SUB|MUL|DIV'): TokenSpec.OP,
+    re.compile(r'DEF'): TokenSpec.DEF,
+    re.compile(r'END'): TokenSpec.END,
+    re.compile('CALL|SET|ADD|SUB|MUL|DIV'): TokenSpec.OP,
     re.compile(r'^r[\d]+$'): TokenSpec.LOC,
     re.compile(r'^[\d]+$'): TokenSpec.NUM,
     re.compile('^[a-zA-Z_]+$'): TokenSpec.IDENT,
@@ -63,7 +64,7 @@ class Lexer:
         tokens = [self._create_token_obj(t) for t in tokens if t]
         return tokens
 
-    def _wrap_main_prcd(self, tokens):
+    def _wrap_main_proc(self, tokens):
         header_tokens = self(MAIN_PROCEDURE_HEADER, _wrap_guard=True)
         # exclude the very last EOL.
         tail_tokens = self(MAIN_PROCEDURE_TAIL, _wrap_guard=True)[:-1]
@@ -78,7 +79,7 @@ class Lexer:
                 tokens.extend(self._parse_word(word))
 
         if not _wrap_guard:
-            tokens = self._wrap_main_prcd(tokens)
+            tokens = self._wrap_main_proc(tokens)
 
         return tokens
 
