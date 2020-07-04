@@ -1,7 +1,6 @@
 from .types import TokenT, List
 from .structs import Stack, TokenSpec
-from .procedure import Procedure
-from .op import Op
+from .core import Op, Procedure
 
 
 class OpParser:
@@ -97,7 +96,6 @@ class ProcedureParser:
                 state['seen_sep'] = True
                 state['seen_arg'] = False
 
-        args = {t.val: t for t in args}
         return args
 
     def __call__(self, proc):
