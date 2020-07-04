@@ -27,23 +27,25 @@ class Signature:
 
 class Compiler:
 
-    def compile_obj(self, obj):
-        if isinstance(obj, Op):
-            op_name = obj.name.val
-            if op_name not in OPS:
-                msg = f'got unknown op `{op_name}`.'
-                raise Exception(msg)
-
-            # spawn concrete implementation of op.
-            concrete_obj = OPS[op_name]()
-            concrete_obj.copy_state_of(obj)
-            obj = concrete_obj
-
+    def _set_sig(self, obj):
         sig = Signature(sig_def=obj.SIG_DEF, args=obj.args)
         obj.sig = sig
         return obj
 
+    def compile_op(self, op):
+        op_name = op.name.val
+        if op_name not in OPS:
+            msg = f'got unknown op `{op_name}`.'
+            raise Exception(msg)
+
+        # spawn concrete implementation of op.
+        concrete_op = OPS[op_name]()
+        concrete_op.copy_state_of(op)
+        op = concrete_op
+        op = self._set_sig(op)
+        return op
+
     def compile_proc(self, proc):
-        proc = self.compile_obj(proc)
-        proc.ops = [self.compile_obj(op) for op in proc.ops]
+        proc.ops = [self.compile_op(op) for op in proc.ops]
+        proc = self._set_sig(proc)
         return proc
