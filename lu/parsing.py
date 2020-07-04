@@ -1,39 +1,7 @@
-from copy import copy
-
 from .types import TokenT, List
-from .structs import TokenSpec
+from .structs import Stack, TokenSpec
 from .procedure import Procedure
 from .op import Op
-
-
-class Stack:
-
-    def __init__(self):
-        self._cont = []
-
-    def __repr__(self):
-        return repr(self._cont)
-
-    @property
-    def elements(self):
-        return copy(self._cont)
-
-    def clear(self):
-        self._cont = []
-
-    def push(self, el):
-        self._cont.append(el)
-
-    def peek(self):
-        return self._cont[-1] if self._cont else None
-
-    def pop(self):
-        return self._cont.pop() if self._cont else None
-
-    def pop_all(self):
-        rv = self.elements
-        self.clear()
-        return rv
 
 
 class OpParser:
