@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Any
 
 
 class TokenT:
     pass
 
 
-__all__ = ['List', 'TokenT']
+__all__ = ['Any', 'List', 'TokenT']
