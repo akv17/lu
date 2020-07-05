@@ -11,7 +11,7 @@ TSPEC_REGEXP_MAP = {
     re.compile(r'END'): TokenSpec.END,
     re.compile('CALL|SET|ADD|SUB|MUL|DIV'): TokenSpec.OP,
     re.compile(r'^r[\d]+$'): TokenSpec.LOC,
-    re.compile(r'^[\d]+$'): TokenSpec.NUM,
+    re.compile(r'^[\d]+$'): TokenSpec.CONST,
     re.compile('^[a-zA-Z_]+$'): TokenSpec.IDENT,
 }
 MAIN_PROCEDURE_HEADER = 'DEF __MAIN__ ()'
@@ -33,7 +33,15 @@ class Lexer:
             match = t_regexp.match(t_str)
 
             if match is not None:
-                return Token(spec=t_spec, val=t_str)
+                tok = Token(spec=t_spec, val=t_str)
+
+                if t_spec == TokenSpec.CONST:
+                    tok.const_val = int(tok.val)
+
+                elif t_spec == TokenSpec.LOC:
+                    tok.const_val = int(tok.val.replace('r', ''))
+
+                return tok
 
         else:
             msg = f'invalid token `{t_str}`.'
@@ -82,9 +90,3 @@ class Lexer:
             tokens = self._wrap_main_proc(tokens)
 
         return tokens
-
-
-lexer = Lexer(
-    syntax_tokens=SYNTAX_TOKENS,
-    tspec_regexp_map=TSPEC_REGEXP_MAP
-)
