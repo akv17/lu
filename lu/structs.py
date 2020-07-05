@@ -1,6 +1,8 @@
 from copy import copy
 from dataclasses import dataclass
 
+from .types import Any
+
 
 class Stack:
 
@@ -36,7 +38,7 @@ class TokenSpec:
     EOL = 'EOL'
     OP = 'OP'
     LOC = 'LOC'
-    NUM = 'NUM'
+    CONST = 'CONST'
     IDENT = 'IDENT'
     SYNTAX = 'SYNTAX'
     DEF = 'DEF'
@@ -47,4 +49,5 @@ class TokenSpec:
 class Token:
     spec: TokenSpec
     val: str
+    const_val: Any = None
     line_num: int = -1
